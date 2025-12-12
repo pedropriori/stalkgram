@@ -603,9 +603,14 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                   </li>
                 ))}
               </ul>
-              <button className="w-full rounded-lg bg-green-500 px-4 py-3 font-semibold text-white hover:bg-green-600 transition">
+              <a
+                href="https://checkout.perfectpay.com.br/pay/PPU38CQ4LNT?"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full rounded-lg bg-green-500 px-4 py-3 text-center font-semibold text-white hover:bg-green-600 transition"
+              >
                 Comprar Plano
-              </button>
+              </a>
             </div>
 
             {/* Plano 2 - Mais Escolhido */}
@@ -646,9 +651,14 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                   </li>
                 ))}
               </ul>
-              <button className="w-full rounded-lg bg-green-500 px-4 py-3 font-semibold text-white hover:bg-green-600 transition">
+              <a
+                href="https://checkout.perfectpay.com.br/pay/PPU38CQ4LNJ?"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full rounded-lg bg-green-500 px-4 py-3 text-center font-semibold text-white hover:bg-green-600 transition"
+              >
                 Comprar Plano
-              </button>
+              </a>
             </div>
           </div>
         </div>
