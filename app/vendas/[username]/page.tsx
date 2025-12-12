@@ -4,6 +4,7 @@ import Link from "next/link";
 import MatrixBackground from "@/app/components/matrix-background";
 import FAQAccordion from "@/app/components/faq-accordion";
 import SaleTimer from "@/app/components/sale-timer";
+import ScrollToPlansButton from "@/app/components/scroll-to-plans-button";
 
 interface PageParams {
   username?: string;
@@ -122,7 +123,7 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
               </p>
             </div>
           )}
-          <button className="w-full rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 transition">
+          <ScrollToPlansButton className="w-full rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 transition">
             <div className="flex flex-col items-center gap-0.5">
               <div>
                 <span>Sem precisar de senha. </span>
@@ -132,7 +133,7 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                 <span>Sem que a pessoa saiba.</span>
               </div>
             </div>
-          </button>
+          </ScrollToPlansButton>
         </div>
 
         {/* Seta animada */}
@@ -216,9 +217,9 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
               <div className="bg-gray-800 p-4">
                 <p className="text-base font-bold text-white mb-1">Localização atual</p>
                 <p className="text-sm text-white/90 mb-4">@{profile.username} está compartilhando</p>
-                <button className="w-full rounded-lg bg-gray-700 hover:bg-gray-600 px-4 py-2.5 text-sm font-semibold text-white transition">
+                <ScrollToPlansButton className="w-full rounded-lg bg-gray-700 hover:bg-gray-600 px-4 py-2.5 text-sm font-semibold text-white transition">
                   Ver
-                </button>
+                </ScrollToPlansButton>
               </div>
             </div>
           </div>
@@ -570,7 +571,7 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
         </div>
 
         {/* Planos */}
-        <div className="mb-12">
+        <div id="planos" className="mb-12">
           <div className="mb-6 mx-auto max-w-xs rounded-full bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-2.5 text-center animate-pulse-opacity">
             <p className="text-sm font-bold text-white">PROMOÇÃO FIM DE ANO - LIMITADA</p>
           </div>
