@@ -5,3 +5,4 @@ export interface InstagramProvider {
   getFollowingSampleByUserId(userId: string): Promise<FollowingUser[]>;
 }
 
+

@@ -4,12 +4,7 @@ import type { NextRequest } from "next/server";
 const COOKIE_NAME = "sg_allowed_username";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 1 ano em segundos
 
-const PROTECTED_ROUTES = [
-  /^\/confirmar\/[^/]+$/,
-  /^\/vendas\/[^/]+$/,
-  /^\/perfil\/[^/]+$/,
-  /^\/dm\/[^/]+/,
-];
+const PROTECTED_ROUTES = [/^\/vendas\/[^/]+$/, /^\/perfil\/[^/]+$/, /^\/dm\/[^/]+/];
 
 function extractUsernameFromPath(pathname: string): string | null {
   for (const pattern of PROTECTED_ROUTES) {
@@ -28,14 +23,14 @@ function getCookieValue(request: NextRequest, name: string): string | null {
   return request.cookies.get(name)?.value || null;
 }
 
-function setCookie(response: NextResponse, name: string, value: string): void {
+function clearCookie(response: NextResponse, name: string): void {
   response.cookies.set({
     name,
-    value,
+    value: "",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: COOKIE_MAX_AGE,
+    maxAge: 0,
     path: "/",
   });
 }
@@ -58,6 +53,17 @@ function redirectToAllowedUsername(
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const searchParams = request.nextUrl.searchParams;
+
+  const shouldResetUser = searchParams.get("resetUser") === "1";
+  if (shouldResetUser) {
+    const url = new URL(request.url);
+    url.searchParams.delete("resetUser");
+    const response = NextResponse.redirect(url);
+    clearCookie(response, COOKIE_NAME);
+    return response;
+  }
+
   const username = extractUsernameFromPath(pathname);
 
   if (!username) {
@@ -66,13 +72,7 @@ export function middleware(request: NextRequest) {
 
   const allowedUsername = getCookieValue(request, COOKIE_NAME);
 
-  if (!allowedUsername) {
-    const response = NextResponse.next();
-    setCookie(response, COOKIE_NAME, username);
-    return response;
-  }
-
-  if (allowedUsername !== username) {
+  if (allowedUsername && allowedUsername !== username) {
     return redirectToAllowedUsername(request, allowedUsername);
   }
 
@@ -81,10 +81,10 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/confirmar/:username*",
     "/vendas/:username*",
     "/perfil/:username*",
     "/dm/:username*",
   ],
 };
+
 

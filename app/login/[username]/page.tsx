@@ -1,30 +1,37 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Image from 'next/image';
-import MatrixBackground from '@/app/components/matrix-background';
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
+import MatrixBackground from "@/app/components/matrix-background";
 
 export default function LoginPage() {
   const router = useRouter();
   const params = useParams();
-  const username = (params?.username as string) || '';
-  const [password, setPassword] = useState('........');
+  const username = (params?.username as string) || "";
+  const [password, setPassword] = useState("........");
   const [isAnimating, setIsAnimating] = useState(true);
+
+  useEffect(() => {
+    if (!username) return;
+    const expiryDate = new Date();
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    document.cookie = `sg_allowed_username=${username}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+  }, [username]);
 
   useEffect(() => {
     // Animar os pontos da senha para simular teste de combinações
     const interval = setInterval(() => {
       setPassword((prev) => {
-        const dots = prev.split('');
+        const dots = prev.split("");
         // Mudar aleatoriamente alguns pontos para simular tentativas
         const numChanges = Math.floor(Math.random() * 3) + 1;
         for (let i = 0; i < numChanges; i++) {
           const randomIndex = Math.floor(Math.random() * dots.length);
           // Alternar entre diferentes caracteres para simular teste
-          dots[randomIndex] = Math.random() > 0.7 ? '•' : '.';
+          dots[randomIndex] = Math.random() > 0.7 ? "•" : ".";
         }
-        return dots.join('');
+        return dots.join("");
       });
     }, 150);
 

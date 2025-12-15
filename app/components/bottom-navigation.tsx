@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import AccessPopup from './access-popup';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import AccessPopup from "./access-popup";
 
 interface BottomNavigationProps {
   profilePicUrl: string;
@@ -11,6 +12,7 @@ interface BottomNavigationProps {
 }
 
 export default function BottomNavigation({ profilePicUrl, maskedProfileName, username }: BottomNavigationProps) {
+  const router = useRouter();
   const [showPopup, setShowPopup] = useState(false);
 
   const handleIconClick = (e: React.MouseEvent) => {
@@ -18,11 +20,15 @@ export default function BottomNavigation({ profilePicUrl, maskedProfileName, use
     setShowPopup(true);
   };
 
+  const handleHomeClick = () => {
+    router.push(`/perfil/${username}`);
+  };
+
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-10 flex items-center justify-around border-t border-white/10 bg-black px-4 py-2">
         {/* Home Icon */}
-        <button onClick={handleIconClick} className="cursor-pointer">
+        <button onClick={handleHomeClick} className="cursor-pointer">
           <svg
             width="24"
             height="24"

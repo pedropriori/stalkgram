@@ -50,3 +50,4 @@ export type HikerProfile = z.infer<typeof HikerProfileSchema>;
 export type HikerFollowingUser = z.infer<typeof HikerFollowingUserSchema>;
 export type HikerFollowingResponse = z.infer<typeof HikerFollowingResponseSchema>;
 
+

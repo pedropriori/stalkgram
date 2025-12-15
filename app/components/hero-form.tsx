@@ -1,17 +1,19 @@
-'use client';
+"use client";
 
 import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-// Função para obter o username permitido do cookie
 function getAllowedUsername(): string | null {
-  if (typeof document === 'undefined') return null;
-  const cookies = document.cookie.split(';');
+  if (typeof document === "undefined") return null;
+  const cookies = document.cookie.split(";");
   for (const cookie of cookies) {
-    const trimmed = cookie.trim();
-    if (trimmed.startsWith('sg_allowed_username=')) {
-      return trimmed.split('=')[1] || null;
+    const trimmedCookie = cookie.trim();
+    if (trimmedCookie.startsWith("sg_allowed_username=")) {
+      const parts = trimmedCookie.split("=");
+      if (parts.length === 2 && parts[1]) {
+        return parts[1];
+      }
     }
   }
   return null;
@@ -50,14 +52,14 @@ export default function HeroForm() {
     event.preventDefault();
     const cleanUsername = username.replace("@", "").trim();
     if (!cleanUsername) return;
-    
+
     const allowedUsername = getAllowedUsername();
-    
     if (allowedUsername) {
       router.push(`/vendas/${allowedUsername}`);
-    } else {
-      router.push(`/confirmar/${cleanUsername}`);
+      return;
     }
+
+    router.push(`/confirmar/${cleanUsername}`);
   }
 
   function handleCardClick() {
