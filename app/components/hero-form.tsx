@@ -4,11 +4,17 @@ import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-// Função para verificar se o cookie existe
-function hasCompletedProcess(): boolean {
-  if (typeof document === 'undefined') return false;
+// Função para obter o username permitido do cookie
+function getAllowedUsername(): string | null {
+  if (typeof document === 'undefined') return null;
   const cookies = document.cookie.split(';');
-  return cookies.some(cookie => cookie.trim().startsWith('deepgram_completed=true'));
+  for (const cookie of cookies) {
+    const trimmed = cookie.trim();
+    if (trimmed.startsWith('sg_allowed_username=')) {
+      return trimmed.split('=')[1] || null;
+    }
+  }
+  return null;
 }
 
 export default function HeroForm() {
@@ -45,12 +51,11 @@ export default function HeroForm() {
     const cleanUsername = username.replace("@", "").trim();
     if (!cleanUsername) return;
     
-    // Verificar se já completou o processo
-    if (hasCompletedProcess()) {
-      // Redirecionar direto para a página de vendas
-      router.push(`/vendas/${cleanUsername}`);
+    const allowedUsername = getAllowedUsername();
+    
+    if (allowedUsername) {
+      router.push(`/vendas/${allowedUsername}`);
     } else {
-      // Fluxo normal
       router.push(`/confirmar/${cleanUsername}`);
     }
   }

@@ -1,15 +1,20 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function SetCompletionCookie() {
+  const pathname = usePathname();
+  
   useEffect(() => {
-    // Setar cookie quando a página de vendas carregar
-    // Cookie válido por 1 ano
-    const expiryDate = new Date();
-    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-    document.cookie = `deepgram_completed=true; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
-  }, []);
+    const parts = pathname.split('/').filter(Boolean);
+    if (parts.length >= 2) {
+      const username = parts[1];
+      const expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      document.cookie = `sg_allowed_username=${username}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+    }
+  }, [pathname]);
 
   return null;
 }
