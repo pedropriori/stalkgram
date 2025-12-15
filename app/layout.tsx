@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+import { UtmifyPixel } from "./components/utmify-pixel";
+import { ClarityScript } from "./components/clarity-script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Script
+          src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+          data-utmify-prevent-xcod-sck
+          data-utmify-prevent-subids
+          strategy="afterInteractive"
+        />
+        <UtmifyPixel />
+        <ClarityScript />
         {children}
       </body>
     </html>
