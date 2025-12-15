@@ -1,7 +1,7 @@
 import scrapeInstagram from "@/app/api/instagram/instagram-scraper";
 import Image from "next/image";
 import Link from "next/link";
-import ChatPopupWrapper from "@/app/components/chat-popup-wrapper";
+import ChatMessages from "@/app/components/chat-messages";
 
 interface PageParams {
   username?: string;
@@ -30,16 +30,27 @@ function hashString(str: string): number {
   return Math.abs(hash);
 }
 
+// Mensagens anteriores (com blur) - aparecem ao fazer scroll para cima
+const previousMessages = [
+  { type: "other" as const, text: "você não me respondeu ontem…", blurred: true },
+  { type: "me" as const, text: "desculpa, tava ocupado", blurred: true },
+  { type: "other" as const, text: "ocupado com o quê?", blurred: true },
+  { type: "me" as const, text: "nada demais, só trabalho", blurred: true },
+  { type: "other" as const, text: "hmm… acredito", blurred: true },
+  { type: "other" as const, text: "voice", duration: "0:15", blurred: true },
+];
+
+// Mensagens principais (sem blur) - storytelling completo
 const chatMessages = [
-  { type: "other", text: "Oi, você já chegou?", blurred: false },
-  { type: "me", text: "Não... ainda estou com", blurred: true },
-  { type: "other", text: "Denovo? Você disse que", blurred: true },
-  { type: "me", text: "Mensagem restrita", blurred: true },
-  { type: "other", text: "Não acredito!!! Você sempre faz isso quando está com", blurred: true },
-  { type: "other", text: "voice", duration: "0:32", blurred: false },
-  { type: "me", text: "voice", duration: "1:47", blurred: false },
-  { type: "other", text: "Não quero mais saber, vou", blurred: true },
-  { type: "me", text: "Vamos conversar pessoalmente na", blurred: true },
+  { type: "other" as const, text: "você tava onde ontem? 🤨", blurred: false },
+  { type: "me" as const, text: "eu? nada… por quê?", blurred: false },
+  { type: "other" as const, text: "porque eu vi você e fingi que não vi…", blurred: false },
+  { type: "me" as const, text: "você viu mesmo? kkk", blurred: false },
+  { type: "other" as const, text: "não faz essa cara de inocente…", blurred: false },
+  { type: "other" as const, text: "voice", duration: "0:27", blurred: false },
+  { type: "me" as const, text: "voice", duration: "1:12", blurred: false },
+  { type: "other" as const, text: "tá… então hoje você me deve uma coisa.", blurred: false },
+  { type: "me" as const, text: "depende do que for 😅", blurred: false },
 ];
 
 export default async function ChatPage({ params }: { params: PageParams | Promise<PageParams> }) {
@@ -104,7 +115,6 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
   // para manter consistência com a lista de DM
 
   return (
-    <ChatPopupWrapper username={username}>
     <main className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-md bg-black flex flex-col h-screen">
         {/* Header do Chat */}
@@ -174,110 +184,11 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
         </header>
 
         {/* Área de Chat */}
-        <div className="flex-1 overflow-y-auto px-4 pb-20">
-          <div className="pt-6 pb-4">
-            <div className="flex justify-end mb-4">
-              <span className="text-xs text-white/60">:31</span>
-            </div>
-            
-            <div className="space-y-4">
-              {chatMessages.map((msg, index) => {
-                if (msg.type === "other") {
-                  return (
-                    <div key={index} className="flex items-end gap-2">
-                      <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center shrink-0">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
-                      </div>
-                      {msg.text === "voice" ? (
-                        <div className="bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[75%]">
-                        <div className="flex items-center gap-3">
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polygon points="5 3 19 12 5 21 5 3" />
-                          </svg>
-                          <div className="flex-1 flex items-center gap-0.5">
-                            <div className="h-1 w-0.5 bg-white rounded-full" />
-                            <div className="h-2 w-0.5 bg-white rounded-full" />
-                            <div className="h-3 w-0.5 bg-white rounded-full" />
-                            <div className="h-4 w-0.5 bg-white rounded-full" />
-                            <div className="h-3 w-0.5 bg-white rounded-full" />
-                            <div className="h-2 w-0.5 bg-white rounded-full" />
-                            <div className="h-1 w-0.5 bg-white rounded-full" />
-                          </div>
-                          <span className="text-xs text-white/80">{msg.duration}</span>
-                        </div>
-                        <p className="text-xs text-white/60 mt-2">Ver transcrição</p>
-                        </div>
-                      ) : (
-                        <div className={`bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[75%] ${msg.blurred ? "blur-sm select-none" : ""}`}>
-                          <p className="text-sm text-white leading-relaxed">{msg.text}</p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div key={index} className="flex justify-end">
-                      {msg.text === "voice" ? (
-                        <div className="bg-purple-600 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[75%]">
-                        <div className="flex items-center gap-3">
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polygon points="5 3 19 12 5 21 5 3" />
-                          </svg>
-                          <div className="flex-1 flex items-center gap-0.5">
-                            <div className="h-1 w-0.5 bg-white rounded-full" />
-                            <div className="h-2 w-0.5 bg-white rounded-full" />
-                            <div className="h-3 w-0.5 bg-white rounded-full" />
-                            <div className="h-4 w-0.5 bg-white rounded-full" />
-                            <div className="h-3 w-0.5 bg-white rounded-full" />
-                            <div className="h-2 w-0.5 bg-white rounded-full" />
-                            <div className="h-1 w-0.5 bg-white rounded-full" />
-                          </div>
-                          <span className="text-xs text-white/80">{msg.duration}</span>
-                        </div>
-                        <p className="text-xs text-white/60 mt-2">Ver transcrição</p>
-                        </div>
-                      ) : (
-                        <div className={`bg-purple-600 rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[75%] ${msg.blurred ? "blur-sm select-none" : ""}`}>
-                          <p className="text-sm text-white leading-relaxed">{msg.text}</p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-              })}
-            </div>
-          </div>
-        </div>
+        <ChatMessages
+          previousMessages={previousMessages}
+          chatMessages={chatMessages}
+          username={username}
+        />
 
         {/* Barra de Input */}
         <div className="border-t border-white/10 bg-black px-4 py-3">
@@ -352,7 +263,6 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
         </div>
       </div>
     </main>
-    </ChatPopupWrapper>
   );
 }
 

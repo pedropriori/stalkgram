@@ -1,11 +1,21 @@
 import axios, { AxiosInstance } from "axios";
 import crypto from "crypto";
 import https from "https";
+import { DeepgramProvider } from "./providers/deepgram/deepgram-provider";
+import { HikerProvider } from "./providers/hiker/hiker-provider";
+import {
+  getCacheKey,
+  getCached,
+  setCached,
+  getOrCreateInFlight,
+} from "./cache/instagram-cache";
 
 const INSTAGRAM_BASE_URL = "https://www.instagram.com";
 const DEFAULT_FOLLOWING_LIMIT = 50;
 const SAMPLE_SIZE = 10;
 const ipv4Agent = new https.Agent({ family: 4 });
+
+type ProviderMode = "auto" | "deepgram" | "hiker" | "legacy";
 
 interface InstagramUserRaw {
   id: string;
@@ -83,11 +93,11 @@ function buildHeaders(): Record<string, string> {
   const userAgent =
     process.env.IG_USER_AGENT ||
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-  
+
   // Gerar identificadores únicos para parecer navegador real
   const igDid = crypto.randomUUID();
   const mid = crypto.randomBytes(16).toString("base64").replace(/[+/=]/g, "").slice(0, 26);
-  
+
   return {
     "Accept": "*/*",
     "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -170,7 +180,7 @@ function shuffle<T>(items: T[], seed?: string): T[] {
     }
     return cloned;
   }
-  
+
   // Shuffle determinístico baseado no seed
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
@@ -178,14 +188,14 @@ function shuffle<T>(items: T[], seed?: string): T[] {
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash;
   }
-  
+
   // Usar o hash como seed para um gerador pseudo-aleatório simples
   let seedValue = Math.abs(hash);
   function seededRandom() {
     seedValue = (seedValue * 9301 + 49297) % 233280;
     return seedValue / 233280;
   }
-  
+
   for (let i = cloned.length - 1; i > 0; i -= 1) {
     const j = Math.floor(seededRandom() * (i + 1));
     [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
@@ -199,31 +209,31 @@ async function fetchProfile(
 ): Promise<InstagramProfile> {
   const client = createHttpClient(headers);
   const url = `/api/v1/users/web_profile_info/?username=${username}`;
-  
+
   const response = await client.get(url);
-  
+
   if (response.status === 401 || response.status === 403) {
     throw new Error("Sessão inválida ou expirada. Atualize IG_SESSIONID e IG_CSRFTOKEN.");
   }
-  
+
   if (response.status === 429) {
     throw new Error("Muitas requisições. Por favor, aguarde alguns minutos e tente novamente.");
   }
-  
+
   if (response.status === 404) {
     throw new Error("Perfil não encontrado. Verifique se o nome de usuário está correto.");
   }
-  
+
   if (response.status !== 200) {
     // Tentar fallback
     return fallbackProfile(username, client);
   }
-  
+
   const user: InstagramUserRaw | undefined = response.data?.data?.user;
   if (!user || !user.username) {
     return fallbackProfile(username, client);
   }
-  
+
   return mapProfileFromUser(user);
 }
 
@@ -233,18 +243,18 @@ async function fallbackProfile(
 ): Promise<InstagramProfile> {
   const url = `/${username}/?__a=1&__d=dis`;
   const response = await client.get(url);
-  
+
   if (response.status !== 200) {
     throw new Error(`Falha ao buscar perfil (${response.status}).`);
   }
-  
+
   const user: InstagramUserRaw | undefined =
     response.data?.graphql?.user || response.data?.user;
-  
+
   if (!user || !user.username) {
     throw new Error("Perfil não encontrado ou estrutura de dados inesperada.");
   }
-  
+
   return mapProfileFromUser(user);
 }
 
@@ -281,7 +291,7 @@ async function fetchFollowing(
     isVerified: Boolean(user.is_verified),
   }));
   const safe = mapped.filter((item) => Boolean(item.username));
-  
+
   // Função hash determinística
   const hashString = (str: string): number => {
     let hash = 0;
@@ -292,7 +302,7 @@ async function fetchFollowing(
     }
     return Math.abs(hash);
   };
-  
+
   // Ordenar de forma determinística baseado APENAS no hash do username do seguido
   // Usar apenas o username do seguido garante que a ordem seja sempre a mesma,
   // independente de quantas vezes a API seja chamada ou em que ordem retorne os dados
@@ -308,21 +318,119 @@ async function fetchFollowing(
     }
     return hashA - hashB;
   });
-  
+
   // Retornar apenas os primeiros SAMPLE_SIZE, já ordenados de forma determinística
   return sorted.slice(0, SAMPLE_SIZE);
+}
+
+function getProviderMode(): ProviderMode {
+  const mode = (process.env.INSTAGRAM_PROVIDER || "auto").toLowerCase();
+  if (["auto", "deepgram", "hiker", "legacy"].includes(mode)) {
+    return mode as ProviderMode;
+  }
+  return "auto";
+}
+
+async function fetchProfileWithProviders(
+  username: string,
+  mode: ProviderMode,
+): Promise<InstagramProfile> {
+  if (mode === "hiker") {
+    const hikerProvider = new HikerProvider();
+    return hikerProvider.getUserByUsername(username);
+  }
+
+  if (mode === "legacy") {
+    const headers = buildHeaders();
+    return fetchProfile(username, headers);
+  }
+
+  try {
+    const deepgramProvider = new DeepgramProvider();
+    return await deepgramProvider.getUserByUsername(username);
+  } catch (error) {
+    if (mode === "deepgram") {
+      throw error;
+    }
+
+    try {
+      const hikerProvider = new HikerProvider();
+      return await hikerProvider.getUserByUsername(username);
+    } catch (hikerError) {
+      const headers = buildHeaders();
+      return fetchProfile(username, headers);
+    }
+  }
+}
+
+async function fetchFollowingWithProviders(
+  userId: string,
+  mode: ProviderMode,
+): Promise<FollowingUser[]> {
+  if (!userId) {
+    return [];
+  }
+
+  if (mode === "hiker") {
+    const hikerProvider = new HikerProvider();
+    return hikerProvider.getFollowingSampleByUserId(userId);
+  }
+
+  if (mode === "legacy") {
+    const headers = buildHeaders();
+    return fetchFollowing(userId, headers);
+  }
+
+  try {
+    const deepgramProvider = new DeepgramProvider();
+    return await deepgramProvider.getFollowingSampleByUserId(userId);
+  } catch (error) {
+    if (mode === "deepgram") {
+      return [];
+    }
+
+    try {
+      const hikerProvider = new HikerProvider();
+      return await hikerProvider.getFollowingSampleByUserId(userId);
+    } catch (hikerError) {
+      const headers = buildHeaders();
+      return fetchFollowing(userId, headers);
+    }
+  }
 }
 
 export default async function scrapeInstagram(
   username: unknown,
 ): Promise<InstagramScrapeResult> {
   const cleanUsername = sanitizeUsername(username);
-  const headers = buildHeaders();
-  const profile = await fetchProfile(cleanUsername, headers);
-  const followingSample = profile.isPrivate
-    ? []
-    : await fetchFollowing(profile.id, headers, cleanUsername);
-  return { profile, followingSample, status: "ok" };
+  const mode = getProviderMode();
+  const cacheKey = getCacheKey(cleanUsername, mode);
+
+  const cached = getCached(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  return getOrCreateInFlight(cacheKey, async () => {
+    try {
+      const profile = await fetchProfileWithProviders(cleanUsername, mode);
+
+      const followingSample = profile.isPrivate
+        ? []
+        : await fetchFollowingWithProviders(profile.id, mode);
+
+      const result: InstagramScrapeResult = {
+        profile,
+        followingSample,
+        status: "ok",
+      };
+
+      setCached(cacheKey, result);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  });
 }
 
 
