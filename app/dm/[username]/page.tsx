@@ -59,16 +59,31 @@ function getDeterministicTime(seed: string): string {
 }
 
 const messageOptions = [
-  "Oi, você já chegou?",
+  "você tava com quem ontem?…",
+  "não some assim não 😶",
+  "vi você online e fingiu que não viu…",
+  "depois me explica aquela curtida kkk",
+  "promete que isso fica entre a gente?",
+  "tô tentando não pensar nisso, sério…",
+  "ok… mas você me deve uma explicação",
+  "não faz isso comigo de novo…",
+  "tô com saudade do seu jeito 😅",
+  "a gente vai repetir ou vai fingir que não aconteceu?",
+  "tô esperando você falar 'vem'…",
+  "para de me provocar 😏",
+  "você me deixa sem jeito…",
+  "me manda uma foto agora (sem pensar muito)",
+  "eu gostei mais do que devia…",
+  "se eu falar o que eu queria agora você…",
+  "tô indo dormir… mas se você responder eu acordo",
+  "me diz a verdade: você sente também?",
+  "eu ainda lembro do que você falou quando…",
+  "se alguém souber disso eu…",
+  "eu não devia, mas eu queria…",
+  "não acredito que você fez aquilo na frente de…",
+  "a parte que eu mais gostei foi quando você…",
   "eii, tá aí? 🔥",
   "preciso falar contigo parada séria",
-  "lembra aquela dia lá em....",
-  "4 novas mensagens",
-  "que foto incrível!",
-  "uau, que lugar lindo!",
-  "arrasou demais!",
-  "sempre com as melhores fotos!",
-  "que energia boa!",
 ];
 
 function getDeterministicMessage(seed: string): string {
@@ -77,16 +92,19 @@ function getDeterministicMessage(seed: string): string {
 }
 
 const noteOptions = [
+  "não conta pra ninguém…",
+  "eu vi. tá? 👀",
+  "alguém me explica isso…",
+  "não era pra ter sido tão bom",
+  "tô me segurando aqui",
+  "tá… eu admito",
+  "depois eu te falo",
+  "me fez sorrir hoje",
+  "ok… gostei",
+  "não some.",
   "Oi, como você está?",
   "Bom dia!",
   "Tudo bem?",
-  "Que dia lindo!",
-  "Fazendo o quê?",
-  "E aí?",
-  "Tudo certo?",
-  "Oi!",
-  "Como foi seu dia?",
-  "Tchau!",
 ];
 
 function getDeterministicNote(seed: string): string {
@@ -157,13 +175,13 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
   }
   
   // Gerar lista de mensagens com dados dos seguidos (determinístico)
-  // Primeiras 5 mensagens fixas conforme a imagem
+  // Primeiras 5 mensagens fixas com foco em ciúme + flerte
   const fixedMessages = [
-    { message: "Oi, você já chegou?", time: "25 min", isLocked: false, isBlurred: false },
-    { message: "eii, tá aí? 🔥", time: "8 h", isLocked: true, isBlurred: false },
-    { message: "preciso falar contigo parada séria", time: "4 h", isLocked: true, isBlurred: false },
-    { message: "lembra aquela dia lá em...", time: "12 min", isLocked: true, isBlurred: false },
-    { message: "4 novas mensagens", time: "18 min", isLocked: true, isBlurred: false },
+    { message: "você tava com quem ontem?…", time: "25 min", isLocked: false, isBlurred: false },
+    { message: "não some assim não 😶", time: "8 h", isLocked: true, isBlurred: false },
+    { message: "vi você online e fingiu que não viu…", time: "4 h", isLocked: true, isBlurred: false },
+    { message: "promete que isso fica entre a gente?", time: "12 min", isLocked: true, isBlurred: false },
+    { message: "tô esperando você falar 'vem'…", time: "18 min", isLocked: true, isBlurred: false },
   ];
 
   const messages = followingUsers.slice(0, 8).map((user, index) => {
