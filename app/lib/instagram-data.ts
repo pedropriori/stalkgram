@@ -83,8 +83,9 @@ export async function revalidateInstagramCache(
 
   const tags = [`instagram:${providerMode}`, `instagram:${cleanUsername}`];
 
+  // Next.js 16 requer o segundo parâmetro 'max' para stale-while-revalidate
   for (const tag of tags) {
-    revalidateTag(tag);
+    revalidateTag(tag, "max");
   }
 
   if (process.env.NODE_ENV === "development") {
