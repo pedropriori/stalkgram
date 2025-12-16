@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import scrapeInstagram from "./instagram-scraper";
+import { getInstagramData } from "@/app/lib/instagram-data";
 import { checkRateLimit } from "./rate-limiter";
 
 interface RequestBody {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as RequestBody;
     const username = body.username || "";
-    const data = await scrapeInstagram(username);
+    const data = await getInstagramData(username);
     return NextResponse.json(data, {
       headers: {
         "X-RateLimit-Limit": "10",

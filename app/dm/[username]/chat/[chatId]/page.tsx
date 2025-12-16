@@ -1,6 +1,7 @@
-import scrapeInstagram from "@/app/api/instagram/instagram-scraper";
+import { getInstagramData } from "@/app/lib/instagram-data";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import ChatMessages from "@/app/components/chat-messages";
 
@@ -153,6 +154,11 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
   const profile = data.profile;
   const hasFollowing = data.followingSample.length > 0;
 
+  // Se o perfil for privado e não tiver dados de seguidos, redirecionar para vendas
+  if (profile.isPrivate && !hasFollowing) {
+    redirect(`/vendas/${profile.username}`);
+  }
+
   const cookieStore = await cookies();
   const followingCookieName = `sg_dm_following_${username}`;
   const existingFollowingCookie = cookieStore.get(followingCookieName)?.value ?? "";
@@ -214,8 +220,8 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
         {/* Header do Chat */}
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-black px-4 py-3">
           <div className="flex items-center gap-3">
-            <Link 
-              href={`/dm/${username}`} 
+            <Link
+              href={`/dm/${username}`}
               className="flex items-center"
               suppressHydrationWarning
             >
@@ -368,7 +374,7 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
 
 async function getProfileData(username: string) {
   try {
-    const data = await scrapeInstagram(username);
+    const data = await getInstagramData(username);
     return { data, error: "" };
   } catch (error) {
     const message =

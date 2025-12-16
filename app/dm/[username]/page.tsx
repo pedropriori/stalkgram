@@ -1,6 +1,7 @@
-import scrapeInstagram from "@/app/api/instagram/instagram-scraper";
+import { getInstagramData } from "@/app/lib/instagram-data";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import DMMessagesList from "@/app/components/dm-messages-list";
 import BottomNavigation from "@/app/components/bottom-navigation";
@@ -156,8 +157,14 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
 
   const data = result.data;
   const profile = data.profile;
-  const maskedProfileName = maskFullName(profile.fullName, profile.username);
   const hasFollowing = data.followingSample.length > 0;
+
+  // Se o perfil for privado e não tiver dados de seguidos, redirecionar para vendas
+  if (profile.isPrivate && !hasFollowing) {
+    redirect(`/vendas/${profile.username}`);
+  }
+
+  const maskedProfileName = maskFullName(profile.fullName, profile.username);
 
   const cookieStore = await cookies();
   const followingCookieName = `sg_dm_following_${username}`;
@@ -245,8 +252,8 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
         <header className="sticky top-0 z-10 border-b border-white/10 bg-black">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
-              <Link 
-                href={`/perfil/${username}`} 
+              <Link
+                href={`/perfil/${username}`}
                 className="flex items-center"
                 suppressHydrationWarning
               >
@@ -402,7 +409,7 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
 
 async function getProfileData(username: string) {
   try {
-    const data = await scrapeInstagram(username);
+    const data = await getInstagramData(username);
     return { data, error: "" };
   } catch (error) {
     const message =

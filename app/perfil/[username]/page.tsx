@@ -1,6 +1,7 @@
-import scrapeInstagram from "@/app/api/instagram/instagram-scraper";
+import { getInstagramData } from "@/app/lib/instagram-data";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import FeedInteractions from "@/app/components/feed-interactions";
 import FeedPost from "@/app/components/feed-post";
 import StoriesSection from "@/app/components/stories-section";
@@ -63,7 +64,7 @@ function getRandomComment() {
     "amei",
     "que lugar incrível"
   ];
-  
+
   const emojiOptions = [
     { emojis: "❤️❤️", count: 2 },
     { emojis: "❤️", count: 1 },
@@ -76,13 +77,13 @@ function getRandomComment() {
     { emojis: "❤️🔥", count: 2 },
     { emojis: "💖💖", count: 2 }
   ];
-  
+
   const textSizeOptions = ["text-xs", "text-sm", "text-base"];
-  
+
   const text = commentOptions[Math.floor(Math.random() * commentOptions.length)];
   const emoji = emojiOptions[Math.floor(Math.random() * emojiOptions.length)];
   const textSize = textSizeOptions[Math.floor(Math.random() * textSizeOptions.length)];
-  
+
   return {
     text,
     emojis: emoji.emojis,
@@ -123,6 +124,12 @@ export default async function PerfilPage({ params }: { params: PageParams | Prom
   const data = result.data;
   const profile = data.profile;
   const hasFollowing = data.followingSample.length > 0;
+
+  // Se o perfil for privado e não tiver dados de seguidos, redirecionar para vendas
+  if (profile.isPrivate && !hasFollowing) {
+    redirect(`/vendas/${profile.username}`);
+  }
+
   const maskedProfileUsername = maskUsername(profile.username);
   const maskedProfileName = maskFullName(profile.fullName, profile.username);
   const followingUsers = hasFollowing ? data.followingSample : [];
@@ -148,27 +155,27 @@ export default async function PerfilPage({ params }: { params: PageParams | Prom
         <div className="bg-black">
           {followingUsers.length > 0 ? (
             <FeedInteractions username={username}>
-            <div className="space-y-0">
-              {followingUsers.map((user, index) => {
-                const randomLikes = getRandomLikes();
-                const randomDate = getRandomDate();
-                const randomComments = Math.floor(Math.random() * 5) + 1;
-                const randomShares = Math.floor(Math.random() * 3) + 1;
-                const randomComment = getRandomComment();
-                return (
-                  <FeedPost
-                    key={`post-${user.id}-${index}`}
-                    user={user}
-                    randomLikes={randomLikes}
-                    randomDate={randomDate}
-                    randomComments={randomComments}
-                    randomShares={randomShares}
-                    randomComment={randomComment}
-                    profileUsername={profile.username}
-                  />
-                );
-              })}
-            </div>
+              <div className="space-y-0">
+                {followingUsers.map((user, index) => {
+                  const randomLikes = getRandomLikes();
+                  const randomDate = getRandomDate();
+                  const randomComments = Math.floor(Math.random() * 5) + 1;
+                  const randomShares = Math.floor(Math.random() * 3) + 1;
+                  const randomComment = getRandomComment();
+                  return (
+                    <FeedPost
+                      key={`post-${user.id}-${index}`}
+                      user={user}
+                      randomLikes={randomLikes}
+                      randomDate={randomDate}
+                      randomComments={randomComments}
+                      randomShares={randomShares}
+                      randomComment={randomComment}
+                      profileUsername={profile.username}
+                    />
+                  );
+                })}
+              </div>
             </FeedInteractions>
           ) : (
             <div className="flex min-h-[400px] flex-col items-center justify-center px-4 py-10 text-center">
@@ -207,7 +214,7 @@ export default async function PerfilPage({ params }: { params: PageParams | Prom
 
 async function getProfileData(username: string) {
   try {
-    const data = await scrapeInstagram(username);
+    const data = await getInstagramData(username);
     return { data, error: "" };
   } catch (error) {
     const message =

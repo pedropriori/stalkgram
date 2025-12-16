@@ -1,4 +1,4 @@
-import scrapeInstagram from "@/app/api/instagram/instagram-scraper";
+import { getInstagramData } from "@/app/lib/instagram-data";
 import Image from "next/image";
 import Link from "next/link";
 import MatrixBackground from "@/app/components/matrix-background";
@@ -14,7 +14,7 @@ async function resolveParams(params: unknown): Promise<PageParams> {
 
 async function getProfileData(username: string) {
   try {
-    const data = await scrapeInstagram(username);
+    const data = await getInstagramData(username);
     return { data, error: "" };
   } catch (error) {
     const message =
