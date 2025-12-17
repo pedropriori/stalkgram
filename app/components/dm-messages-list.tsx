@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoading } from "../contexts/loading-context";
 import AccessPopup from "./access-popup";
+import InstagramTimestamp from "./instagram-timestamp";
 interface Message {
   user: {
     id: string;
@@ -136,7 +137,10 @@ export default function DMMessagesList({ messages, username }: DMMessagesListPro
                   <span className="text-sm font-semibold text-white">
                     {maskUsername(msg.user.username)}
                   </span>
-                  <span className="text-xs text-white/60 shrink-0">{msg.time}</span>
+                  <InstagramTimestamp
+                    seed={`${username}-${msg.user.username}-${index}-time`}
+                    className="shrink-0"
+                  />
                 </div>
                 <p className={`text-sm font-semibold text-white truncate ${isSixthAndBeyond ? "blur-sm select-none" : ""}`}>
                   {isSixthAndBeyond ? "Mensagem restrita" : msg.message}
