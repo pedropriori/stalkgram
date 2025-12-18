@@ -75,7 +75,7 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
         <div className="mx-auto max-w-4xl px-4 py-8">
           {/* Logo e Tagline */}
           <div className="mb-8 text-center">
-            <div className="mb-4 flex items-center justify-center">
+            <div className="flex items-center justify-center">
               <Image
                 src="/images/logo.png"
                 alt="StalkGram Logo"
@@ -85,7 +85,9 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                 priority
               />
             </div>
-            <p className="text-lg text-white/80">A maior ferramenta de stalkear do Brasil</p>
+            <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent drop-shadow-lg animate-pulse-opacity">
+              A maior ferramenta Stalker do Brasil
+            </p>
           </div>
 
           {/* Seção de Acesso ao Perfil */}
@@ -140,11 +142,11 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                 {profile.biography}
               </p>
             )}
-            <div className="bg-green-600 rounded-2xl p-4">
+            <ScrollToPlansButton className="w-full bg-green-600 rounded-2xl p-4 hover:bg-green-700 transition cursor-pointer">
               <p className="text-center text-white text-sm font-semibold">
                 Sem precisar de senha. Sem deixar rastros. Sem que a pessoa saiba.
               </p>
-            </div>
+            </ScrollToPlansButton>
           </div>
 
           {/* Seta animada */}
@@ -166,11 +168,13 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
             {/* Feature 1: Mídias */}
             <div className="rounded-2xl border border-white/10 bg-gray-900 p-6">
               <div className="mb-4 flex items-center gap-3">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-                </svg>
+                <div className="bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-2 rounded-lg">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                  </svg>
+                </div>
                 <h3 className="text-lg font-bold text-white">
                   Todas as mídias recebidas e enviadas por @{profile.username}
                 </h3>
@@ -200,12 +204,14 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
             </div>
 
             {/* Feature 2: Localização */}
-            <div className="rounded-2xl border border-white/10 bg-gray-900/80 backdrop-blur-sm p-6">
+            <ScrollToPlansButton className="w-full rounded-2xl border border-white/10 bg-gray-900/80 backdrop-blur-sm p-6 hover:bg-gray-900 transition cursor-pointer">
               <div className="mb-4 flex items-center gap-3">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
+                <div className="bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-2 rounded-lg">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </div>
                 <h3 className="text-lg font-bold text-white">
                   Localização em tempo real de @{profile.username}
                 </h3>
@@ -222,17 +228,20 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                   showBlur={false}
                   showLock={false}
                   showMaskedUsername={false}
+                  renderAsDiv={true}
                 />
               </div>
-            </div>
+            </ScrollToPlansButton>
 
             {/* Feature 3: Stories e Posts Ocultos */}
             <div className="rounded-2xl border border-white/10 bg-gray-900/80 backdrop-blur-sm p-6">
               <div className="mb-4 flex items-center gap-3">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
+                <div className="bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-2 rounded-lg">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </div>
                 <h3 className="text-lg font-bold text-white">Stories e posts ocultos</h3>
               </div>
               <p className="mb-2 text-sm text-white/70">
@@ -266,9 +275,11 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
             {/* Feature 4: Directs */}
             <div className="rounded-2xl border border-white/10 bg-gray-900 p-6">
               <div className="mb-4 flex items-center gap-3">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" strokeWidth="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
+                <div className="bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 p-2 rounded-lg">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </div>
                 <h3 className="text-lg font-bold text-white">
                   Mensagens privadas do Instagram (Directs)
                 </h3>
@@ -582,14 +593,25 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
 
             <div className="grid gap-6 md:grid-cols-2">
               {/* Plano 1 */}
-              <div className="rounded-2xl border border-white/10 bg-gray-900 p-6">
-                <h3 className="mb-4 text-xl font-bold text-white">Apenas acesso ao perfil</h3>
-                <p className="mb-4 text-sm text-white/70">Acesso ao perfil de @{profile.username}</p>
+              <div className="group relative rounded-2xl border border-white/20 bg-gradient-to-br from-gray-900 to-gray-800 p-5 shadow-2xl transition-all duration-300 hover:border-pink-500/50 hover:shadow-pink-500/20">
                 <div className="mb-4">
-                  <p className="text-sm text-white/60 line-through">De R$ 109,90</p>
-                  <p className="text-3xl font-bold text-white">R$ 49,90</p>
+                  <div className="mb-1.5 inline-block rounded-full bg-pink-500/20 px-2.5 py-0.5">
+                    <p className="text-[10px] font-semibold text-pink-400">Plano Básico</p>
+                  </div>
+                  <h3 className="mb-1 text-xl font-bold text-white">Acesso ao Perfil</h3>
+                  <p className="text-xs text-white/60">Tudo que você precisa para descobrir a verdade sobre @{profile.username}</p>
                 </div>
-                <ul className="mb-6 space-y-2">
+
+                <div className="mb-4 rounded-xl bg-gradient-to-r from-pink-500/10 to-orange-500/10 p-3 border border-pink-500/20">
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-xs text-white/50 line-through">R$ 109,90</p>
+                    <p className="text-3xl font-extrabold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent">R$ 49,90</p>
+                  </div>
+                  <p className="mt-0.5 text-[10px] text-green-400 font-semibold">Economia de R$ 60,00</p>
+                  <p className="mt-1 text-[10px] text-white/50">Menos de R$ 2,00 por dia</p>
+                </div>
+
+                <ul className="mb-4 space-y-1.5">
                   {[
                     "Acesso oculto de 8 mídias",
                     "Stories ocultos",
@@ -597,11 +619,13 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                     "Localização em tempo real",
                     "Acesso a mídias (fotos e vídeos)",
                   ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="green" strokeWidth="2">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span className="text-sm text-white">{feature}</span>
+                    <li key={i} className="flex items-start gap-2">
+                      <div className="mt-0.5 shrink-0 rounded-full bg-green-500/20 p-0.5">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="green" strokeWidth="3">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </div>
+                      <span className="text-xs text-white/90 leading-tight">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -609,58 +633,96 @@ export default async function VendasPage({ params }: { params: PageParams | Prom
                   href="https://checkout.perfectpay.com.br/pay/PPU38CQ4LNT?"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full rounded-lg bg-green-500 px-4 py-3 text-center font-semibold text-white hover:bg-green-600 transition"
+                  className="block w-full rounded-lg bg-gradient-to-r from-pink-500 to-orange-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-lg shadow-pink-500/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-pink-500/40"
                 >
-                  Comprar Plano
+                  Quero Acesso Agora
                 </a>
+                <p className="mt-2 text-center text-[10px] text-white/50">💳 Pagamento 100% seguro</p>
               </div>
 
               {/* Plano 2 - Mais Escolhido */}
-              <div className="rounded-2xl border-2 border-green-500 bg-gray-900 p-6 relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-green-500 px-4 py-1">
-                  <p className="text-xs font-bold text-white">MAIS ESCOLHIDO</p>
+              <div className="group relative rounded-2xl border-2 border-transparent bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 p-5 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-pink-500/30 backdrop-blur-sm">
+                {/* Camada de gradiente colorido por cima */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-500/40 via-orange-500/40 to-yellow-500/40 pointer-events-none"></div>
+                {/* Badge Mais Escolhido */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30">
+                  <div className="rounded-full bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 px-4 py-1 shadow-lg">
+                    <p className="text-[10px] font-bold text-white flex items-center gap-1">
+                      <span>⭐</span> MAIS ESCOLHIDO
+                    </p>
+                  </div>
                 </div>
-                <h3 className="mb-4 mt-4 text-xl font-bold text-white">
-                  Acesso ao perfil de @{profile.username} + Ferramenta completa do StalkGram
-                </h3>
-                <p className="mb-4 text-sm font-semibold text-green-400">
-                  ACESSO COMPLETO + FERRAMENTA VITALÍCIA
-                </p>
-                <div className="mb-4">
-                  <p className="text-sm text-white/60 line-through">De R$ 274,90</p>
-                  <p className="text-3xl font-bold text-white">R$ 59,90</p>
+
+                {/* Efeito de brilho sutil */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-pink-500/0 via-pink-500/10 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+
+                <div className="relative z-20">
+                  <div className="mb-4">
+                    <div className="mb-1.5 inline-block rounded-full bg-gradient-to-r from-pink-500/30 to-yellow-500/30 px-2.5 py-0.5 border border-pink-500/50">
+                      <p className="text-[10px] font-semibold text-yellow-300">Plano Completo</p>
+                    </div>
+                    <h3 className="mb-1 text-xl font-bold text-white">
+                      Acesso Completo + Ferramenta Vitalícia
+                    </h3>
+                    <p className="text-xs text-white/70">Tudo do perfil de @{profile.username} + ferramenta ilimitada para sempre</p>
+                  </div>
+
+                  <div className="mb-4 rounded-xl bg-gradient-to-r from-pink-500/20 via-orange-500/20 to-yellow-500/20 p-3 border-2 border-pink-500/30 relative overflow-hidden">
+                    <div className="absolute inset-0 animate-shimmer-bg"></div>
+                    <div className="relative">
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-xs text-white/50 line-through">R$ 274,90</p>
+                        <p className="text-4xl font-extrabold bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">R$ 59,90</p>
+                      </div>
+                      <p className="mt-0.5 text-[10px] text-green-400 font-bold">Economia de R$ 215,00</p>
+                      <p className="mt-1 text-[10px] text-yellow-300 font-semibold">Menos de uma xícara de café por dia - Acesso Vitalício</p>
+                    </div>
+                  </div>
+
+                  <ul className="mb-4 space-y-1.5">
+                    {[
+                      "Acesso oculto de 8 mídias",
+                      "Stories ocultos",
+                      "Directs em tempo real",
+                      "Localização em tempo real",
+                      "Acesso a mídias (fotos e vídeos)",
+                      "Notificações em tempo real",
+                      "Relatório detalhado",
+                      "Espionar quantos perfis quiser (ILIMITADO)",
+                      "Acesso vitalício",
+                      "Sem mensalidades",
+                      "Localizações antigas e relatório de locais",
+                      "Limpar rastros (em 10 meses úteis)",
+                    ].map((feature, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <div className="mt-0.5 shrink-0 rounded-full bg-gradient-to-r from-pink-500/30 to-yellow-500/30 p-0.5 border border-pink-500/50">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="yellow" strokeWidth="3">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </div>
+                        <span className="text-xs text-white/90 leading-tight font-medium">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <a
+                    href="https://checkout.perfectpay.com.br/pay/PPU38CQ4LNJ?"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative block w-full rounded-lg bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 px-4 py-2.5 text-center text-sm font-bold text-white shadow-2xl shadow-pink-500/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/60 overflow-hidden group/btn"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000"></div>
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      Quero Ver Tudo Agora
+                    </span>
+                  </a>
+
+                  <div className="mt-2 flex items-center justify-center gap-3 text-[10px]">
+                    <p className="text-white/50">💳 Pagamento seguro</p>
+                    <span className="text-white/30">•</span>
+                    <p className="text-green-400 font-semibold">🛡️ Garantia de 30 dias</p>
+                  </div>
                 </div>
-                <ul className="mb-6 space-y-2">
-                  {[
-                    "Acesso oculto de 8 mídias",
-                    "Stories ocultos",
-                    "Directs em tempo real",
-                    "Localização em tempo real",
-                    "Acesso a mídias (fotos e vídeos)",
-                    "Notificações em tempo real",
-                    "Relatório detalhado",
-                    "Espionar quantos perfis quiser (ILIMITADO)",
-                    "Acesso vitalício",
-                    "Sem mensalidades",
-                    "Localizações antigas e relatório de locais",
-                    "Limpar rastros (em 10 meses úteis)",
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="green" strokeWidth="2">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      <span className="text-sm text-white">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href="https://checkout.perfectpay.com.br/pay/PPU38CQ4LNJ?"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full rounded-lg bg-green-500 px-4 py-3 text-center font-semibold text-white hover:bg-green-600 transition"
-                >
-                  Comprar Plano
-                </a>
               </div>
             </div>
           </div>
