@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+const PIXEL_ID = "694062ecad5cf41795f0425c";
+const IS_DEV = process.env.NODE_ENV === "development";
+
 export function UtmifyPixel() {
   useEffect(() => {
     // Verificar se já está no cliente
@@ -50,27 +53,50 @@ export function UtmifyPixel() {
       'script[src="https://cdn.utmify.com.br/scripts/pixel/pixel.js"]'
     );
     if (existingScript) {
+      if (IS_DEV) {
+        console.log("[Utmify Pixel] Script já existe");
+      }
       return () => {
         window.removeEventListener("unhandledrejection", unhandledRejectionHandler);
         window.onerror = originalError;
       };
     }
 
-    // Define o pixelId no window
-    (window as any).pixelId = "694062ecad5cf41795f0425c";
+    // Seguir exatamente o formato fornecido pelo Utmify
+    // window.pixelId = "694062ecad5cf41795f0425c";
+    (window as any).pixelId = PIXEL_ID;
 
-    // Cria e adiciona o script do pixel
-    const script = document.createElement("script");
-    script.setAttribute("async", "");
-    script.setAttribute("defer", "");
-    script.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+    // var a = document.createElement("script");
+    const a = document.createElement("script");
+    // a.setAttribute("async", "");
+    a.setAttribute("async", "");
+    // a.setAttribute("defer", "");
+    a.setAttribute("defer", "");
+    // a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+    a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+    // document.head.appendChild(a);
 
-    // Adicionar error handler no script
-    script.onerror = () => {
-      // Silenciar erros de carregamento do script
+    // Callbacks para monitoramento (adicionados após seguir o formato exato)
+    a.onload = () => {
+      if (IS_DEV) {
+        console.log("[Utmify Pixel] Script carregado com sucesso");
+      }
+      // Disparar evento quando pixel estiver pronto
+      window.dispatchEvent(new CustomEvent("utmify:pixel:loaded"));
     };
 
-    document.head.appendChild(script);
+    a.onerror = () => {
+      if (IS_DEV) {
+        console.error("[Utmify Pixel] Erro ao carregar script");
+      }
+      window.dispatchEvent(new CustomEvent("utmify:pixel:error"));
+    };
+
+    document.head.appendChild(a);
+
+    if (IS_DEV) {
+      console.log("[Utmify Pixel] Script adicionado ao head");
+    }
 
     // Cleanup
     return () => {

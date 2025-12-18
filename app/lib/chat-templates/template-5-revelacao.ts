@@ -44,3 +44,5 @@ export const template5Revelacao: ChatTemplate = {
     },
   ],
 };
+
+

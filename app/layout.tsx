@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
+import { UtmifyUtmsScript } from "./components/utmify-utms-script";
 import { UtmifyPixel } from "./components/utmify-pixel";
 import { ClarityScript } from "./components/clarity-script";
 import { LoadingProviderWrapper } from "./components/loading-provider-wrapper";
@@ -33,12 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Script
-          src="https://cdn.utmify.com.br/scripts/utms/latest.js"
-          data-utmify-prevent-xcod-sck
-          data-utmify-prevent-subids
-          strategy="afterInteractive"
-        />
+        <UtmifyUtmsScript />
         <UtmifyPixel />
         <ClarityScript />
         <UtmifyLinkProtection />

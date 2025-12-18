@@ -50,3 +50,5 @@ export default function MediaMessage({ type, onClick }: MediaMessageProps) {
     </button>
   );
 }
+
+

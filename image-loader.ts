@@ -29,3 +29,5 @@ export default function customImageLoader({
   // Para outras URLs remotas, retornar direto (sem otimização do Next.js quando usa custom loader)
   return src;
 }
+
+

@@ -40,3 +40,5 @@ export default function RestrictedContent({ onClick }: RestrictedContentProps) {
     </button>
   );
 }
+
+

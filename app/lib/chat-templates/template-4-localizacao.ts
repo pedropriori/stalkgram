@@ -54,3 +54,5 @@ export const template4Localizacao: ChatTemplate = {
   ],
 };
 
+
+
