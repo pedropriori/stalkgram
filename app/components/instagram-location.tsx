@@ -9,6 +9,7 @@ interface InstagramLocationProps {
   showBlur?: boolean;
   showLock?: boolean;
   showMaskedUsername?: boolean;
+  renderAsDiv?: boolean;
 }
 
 function maskUsername(username: string): string {
@@ -24,15 +25,18 @@ export default function InstagramLocation({
   showBlur = true,
   showLock = true,
   showMaskedUsername = true,
+  renderAsDiv = false,
 }: InstagramLocationProps) {
   const displayUsername = showMaskedUsername ? maskUsername(username) : `@${username}`;
 
-  return (
-    <button
-      className="text-left overflow-hidden rounded-2xl"
-      style={{ width: '280px', maxWidth: '90vw' }}
-      onClick={onClick}
-    >
+  const containerProps: React.HTMLAttributes<HTMLDivElement | HTMLButtonElement> = {
+    className: "text-left overflow-hidden rounded-2xl",
+    style: { width: '280px', maxWidth: '90vw' },
+    ...(onClick && !renderAsDiv ? { onClick } : {}),
+  };
+
+  const content = (
+    <>
       {/* Top Section - Blurred Map with Avatar */}
       <div className="relative w-full h-36 overflow-hidden">
         {/* Blurred Map Background */}
@@ -112,7 +116,12 @@ export default function InstagramLocation({
           Ver
         </div>
       </div>
-    </button>
+    </>
   );
-}
 
+  if (renderAsDiv) {
+    return <div {...containerProps}>{content}</div>;
+  }
+
+  return <button {...containerProps}>{content}</button>;
+}

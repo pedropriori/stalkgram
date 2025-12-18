@@ -221,3 +221,12 @@ body {
   background-clip: text;
   -webkit-background-clip: text;
 }
+
+.animate-shimmer-bg {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+  background-image: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
+}
