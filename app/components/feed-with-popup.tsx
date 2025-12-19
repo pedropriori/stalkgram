@@ -3,6 +3,11 @@
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import AccessPopup from './access-popup';
+import HeartFilledIcon from './icons/heart-filled';
+import CommentIcon from './icons/comment';
+import RepostIcon from './icons/repost';
+import SendIcon from './icons/send';
+import SaveIcon from './icons/save';
 
 interface FeedPost {
   user: {
@@ -131,50 +136,24 @@ export default function FeedWithPopup({ posts, profileUsername }: FeedWithPopupP
             {/* Ações do Post */}
             <div className="px-4 py-3">
               <div className="flex items-center gap-4">
-                <div onClick={handleHeartClick} className="cursor-pointer">
-                  <Image
-                    src="https://www.deepgram.online/home%20-%20feed/icones/coracao-curtido.svg"
-                    alt="Curtir"
-                    width={24}
-                    height={24}
-                    style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(7471%) hue-rotate(346deg) brightness(99%) contrast(118%)' }}
-                  />
+                <div onClick={handleHeartClick} className="cursor-pointer text-red-500">
+                  <HeartFilledIcon width={24} height={24} />
                 </div>
-                <div className="flex items-center gap-1" onClick={handleCommentClick}>
-                  <Image
-                    src="https://www.deepgram.online/home%20-%20feed/icones/comentario.svg"
-                    alt="Comentar"
-                    width={24}
-                    height={24}
-                    className="cursor-pointer"
-                  />
+                <div className="flex items-center gap-1 text-white" onClick={handleCommentClick}>
+                  <CommentIcon width={24} height={24} className="cursor-pointer" />
                   <span className="text-sm text-white">{post.randomComments}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Image
-                    src="https://www.deepgram.online/home%20-%20feed/icones/repost.svg"
-                    alt="Repost"
-                    width={24}
-                    height={24}
-                    className="cursor-pointer"
-                  />
+                <div className="flex items-center gap-1 text-white">
+                  <RepostIcon width={24} height={24} className="cursor-pointer" />
                   <span className="text-sm text-white">{post.randomShares}</span>
                 </div>
                 <div className="flex-1" />
-                <Image
-                  src="https://www.deepgram.online/home%20-%20feed/icones/enviar.svg"
-                  alt="Enviar"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer"
-                />
-                <Image
-                  src="https://www.deepgram.online/home%20-%20feed/icones/salvar.svg"
-                  alt="Salvar"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer"
-                />
+                <div className="text-white">
+                  <SendIcon width={24} height={24} className="cursor-pointer" />
+                </div>
+                <div className="text-white">
+                  <SaveIcon width={24} height={24} className="cursor-pointer" />
+                </div>
               </div>
             </div>
 

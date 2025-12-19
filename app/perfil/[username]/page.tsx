@@ -1,7 +1,6 @@
-import { getInstagramData } from "@/app/lib/instagram-data";
+import { getInstagramDataOrMock } from "@/app/lib/instagram-data-fallback";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import FeedInteractions from "@/app/components/feed-interactions";
 import FeedPost from "@/app/components/feed-post";
 import StoriesSection from "@/app/components/stories-section";
@@ -165,18 +164,15 @@ export default async function PerfilPage({ params }: { params: PageParams | Prom
     );
   }
 
-  // Se o perfil for privado e não tiver dados de seguidos, redirecionar para vendas
-  // Usar o username da URL, não do cache, para garantir correção
-  if (profile.isPrivate && !hasFollowing) {
-    redirect(`/vendas/${username}`);
-  }
+  // Removido redirect para /vendas - agora usamos mock quando necessário
 
   const maskedProfileUsername = maskUsername(profile.username);
   const maskedProfileName = maskFullName(profile.fullName, profile.username);
 
   // Usar primeiros 12 perfis para stories, com repetição determinística se necessário
   // (perfis diferentes das mensagens da DM)
-  const baseFollowingUsers = hasFollowing ? data.followingSample.slice(0, 12) : [];
+  // Com o novo sistema de fallback, sempre teremos followings (reais ou mock)
+  const baseFollowingUsers = data.followingSample.slice(0, 12);
 
   // Função para repetir perfis de forma determinística
   function getProfilsWithRepetition<T>(profiles: T[], count: number, seed: string): T[] {
@@ -292,14 +288,14 @@ export default async function PerfilPage({ params }: { params: PageParams | Prom
 
 async function getProfileData(username: string) {
   try {
-    const data = await getInstagramData(username);
-    return { data, error: "" };
+    const result = await getInstagramDataOrMock(username);
+    return { data: result.data, error: "", usedMock: result.usedMock };
   } catch (error) {
     const message =
       error instanceof Error
         ? error.message
         : "Erro desconhecido ao buscar dados do Instagram.";
-    return { data: null, error: message };
+    return { data: null, error: message, usedMock: false };
   }
 }
 

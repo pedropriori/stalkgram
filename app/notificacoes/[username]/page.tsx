@@ -1,7 +1,6 @@
-import { getInstagramData } from "@/app/lib/instagram-data";
+import { getInstagramDataOrMock } from "@/app/lib/instagram-data-fallback";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import ProfileHeader from "@/app/components/profile-header";
 import BottomNavigation from "@/app/components/bottom-navigation";
 import NotificacoesContent from "@/app/components/notificacoes-content";
@@ -260,9 +259,7 @@ export default async function NotificacoesPage({
     );
   }
 
-  if (profile.isPrivate && !hasFollowing) {
-    redirect(`/vendas/${username}`);
-  }
+  // Removido redirect para /vendas - agora usamos mock quando necessário
 
   const maskedProfileName = maskUsername(profile.username);
 
@@ -276,6 +273,16 @@ export default async function NotificacoesPage({
 
   if (baseFollowingUsers.length === 0 && hasFollowing) {
     baseFollowingUsers = selectMessageFollowingSample(data.followingSample);
+  }
+
+  // Com o novo sistema de fallback, sempre teremos followings (reais ou mock)
+  // Se ainda assim não houver, usar os dados diretamente do followingSample
+  if (baseFollowingUsers.length === 0 && data.followingSample.length > 0) {
+    baseFollowingUsers = data.followingSample.slice(0, 25).map((user) => ({
+      id: String(user.id),
+      username: user.username,
+      profilePicUrl: user.profilePicUrl,
+    }));
   }
 
   // Gerar notificações
@@ -612,14 +619,14 @@ function NotificationButton({ notification }: { notification: NotificationItem }
 
 async function getProfileData(username: string) {
   try {
-    const data = await getInstagramData(username);
-    return { data, error: "" };
+    const result = await getInstagramDataOrMock(username);
+    return { data: result.data, error: "", usedMock: result.usedMock };
   } catch (error) {
     const message =
       error instanceof Error
         ? error.message
         : "Erro desconhecido ao buscar dados do Instagram.";
-    return { data: null, error: message };
+    return { data: null, error: message, usedMock: false };
   }
 }
 

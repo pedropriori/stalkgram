@@ -24,6 +24,30 @@ function maskUsername(username: string): string {
   return `${firstChar}*****`;
 }
 
+/**
+ * Hash determinístico para gerar valores consistentes baseados em seed
+ */
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Determina se um perfil deve ter borda verde (melhores amigos)
+ * Aproximadamente 30-40% dos perfis terão borda verde
+ */
+function hasGreenBorder(userId: string, username: string): boolean {
+  const seed = `${userId}_${username}_green_border`;
+  const hash = hashString(seed);
+  // 35% de chance de ter borda verde (entre 30-40%)
+  return (hash % 100) < 35;
+}
+
 export default function StoriesSection({
   profilePicUrl,
   profileName,
@@ -61,11 +85,19 @@ export default function StoriesSection({
         {/* Stories dos seguidos - fotos sem blur */}
         {followingUsers.slice(0, 8).map((user, index) => {
           const hasStory = true;
+          const isBestFriend = hasGreenBorder(user.id, user.username);
+          
           return (
             <div key={user.id} className="flex shrink-0 flex-col items-center gap-1">
               <div className="relative cursor-pointer" onClick={handleStoryClick}>
                 {hasStory ? (
-                  <div className="story-blur-container h-16 w-16 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500 overflow-hidden">
+                  <div
+                    className={`story-blur-container h-16 w-16 rounded-full p-[2px] overflow-hidden ${
+                      isBestFriend
+                        ? "bg-gradient-to-tr from-green-400 via-green-500 to-green-600"
+                        : "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500"
+                    }`}
+                  >
                     <div className="h-full w-full rounded-full bg-[#0b1014] p-0.5 relative overflow-hidden">
                       <div className="h-full w-full rounded-full overflow-hidden">
                         <Image

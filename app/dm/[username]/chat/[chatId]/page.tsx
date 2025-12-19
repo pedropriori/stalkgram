@@ -1,7 +1,6 @@
-import { getInstagramData } from "@/app/lib/instagram-data";
+import { getInstagramDataOrMock } from "@/app/lib/instagram-data-fallback";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import ChatMessages from "@/app/components/chat-messages";
 import { ClearLoadingOnMount } from "@/app/components/clear-loading-on-mount";
@@ -82,11 +81,7 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
     );
   }
 
-  // Se o perfil for privado e não tiver dados de seguidos, redirecionar para vendas
-  // Usar o username da URL, não do cache, para garantir correção
-  if (profile.isPrivate && !hasFollowing) {
-    redirect(`/vendas/${username}`);
-  }
+  // Removido redirect para /vendas - agora usamos mock quando necessário
 
   const cookieStore = await cookies();
   const followingCookieName = `sg_dm_following_${username}`;
@@ -96,6 +91,16 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
 
   if (followingUsers.length === 0 && hasFollowing) {
     followingUsers = selectMessageFollowingSample(data.followingSample);
+  }
+
+  // Com o novo sistema de fallback, sempre teremos followings (reais ou mock)
+  // Se ainda assim não houver, usar os dados diretamente do followingSample
+  if (followingUsers.length === 0 && data.followingSample.length > 0) {
+    followingUsers = data.followingSample.slice(0, 25).map((user) => ({
+      id: String(user.id),
+      username: user.username,
+      profilePicUrl: user.profilePicUrl,
+    }));
   }
 
   const chatUserFromList = followingUsers.find(
@@ -303,14 +308,14 @@ export default async function ChatPage({ params }: { params: PageParams | Promis
 
 async function getProfileData(username: string) {
   try {
-    const data = await getInstagramData(username);
-    return { data, error: "" };
+    const result = await getInstagramDataOrMock(username);
+    return { data: result.data, error: "", usedMock: result.usedMock };
   } catch (error) {
     const message =
       error instanceof Error
         ? error.message
         : "Erro desconhecido ao buscar dados do Instagram.";
-    return { data: null, error: message };
+    return { data: null, error: message, usedMock: false };
   }
 }
 

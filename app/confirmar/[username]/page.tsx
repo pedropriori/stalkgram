@@ -1,7 +1,7 @@
-import { getInstagramData } from "@/app/lib/instagram-data";
 import Image from "next/image";
 import Link from "next/link";
 import MatrixBackground from "@/app/components/matrix-background";
+import { getInstagramDataOrMock } from "@/app/lib/instagram-data-fallback";
 
 interface PageParams {
   username?: string;
@@ -14,14 +14,14 @@ async function resolveParams(params: unknown): Promise<PageParams> {
 
 async function getProfileData(username: string) {
   try {
-    const data = await getInstagramData(username);
-    return { data, error: "" };
+    const result = await getInstagramDataOrMock(username);
+    return { data: result.data, error: "", usedMock: result.usedMock };
   } catch (error) {
     const message =
       error instanceof Error
         ? error.message
         : "Erro desconhecido ao buscar dados do Instagram.";
-    return { data: null, error: message };
+    return { data: null, error: message, usedMock: false };
   }
 }
 
@@ -64,10 +64,10 @@ export default async function ConfirmarPage({
             </p>
             <p className="text-sm text-white/70 mb-4">{result.error}</p>
             <Link
-              href="/"
+              href="/username"
               className="block text-center text-pink-500 hover:text-pink-400"
             >
-              Voltar
+              Corrigir @
             </Link>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default async function ConfirmarPage({
           {/* Botões */}
           <div className="flex gap-3">
             <Link
-              href="/"
+              href="/username"
               className="flex-1 rounded-xl border border-white/20 bg-transparent px-4 py-3 text-center text-white font-medium hover:bg-white/5 transition"
             >
               Corrigir @

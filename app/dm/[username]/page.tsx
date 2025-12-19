@@ -1,7 +1,6 @@
-import { getInstagramData } from "@/app/lib/instagram-data";
+import { getInstagramDataOrMock } from "@/app/lib/instagram-data-fallback";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import DMMessagesList from "@/app/components/dm-messages-list";
 import BottomNavigation from "@/app/components/bottom-navigation";
@@ -169,11 +168,7 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
     );
   }
 
-  // Se o perfil for privado e não tiver dados de seguidos, redirecionar para vendas
-  // Usar o username da URL, não do cache, para garantir correção
-  if (profile.isPrivate && !hasFollowing) {
-    redirect(`/vendas/${username}`);
-  }
+  // Removido redirect para /vendas - agora usamos mock quando necessário
 
   const maskedProfileName = maskFullName(profile.fullName, profile.username);
 
@@ -187,17 +182,14 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
     baseFollowingUsers = selectMessageFollowingSample(data.followingSample);
   }
 
-  if (baseFollowingUsers.length === 0) {
-    return (
-      <main className="min-h-screen bg-[#0b1014] text-white">
-        <div className="mx-auto flex max-w-md flex-col">
-          <div className="rounded-2xl border border-white/10 bg-rose-500/10 p-5 text-rose-100">
-            <p className="text-lg font-semibold">Não foi possível carregar</p>
-            <p className="mt-2 text-sm text-rose-50/90">Nenhum usuário seguido encontrado.</p>
-          </div>
-        </div>
-      </main>
-    );
+  // Com o novo sistema de fallback, sempre teremos followings (reais ou mock)
+  // Se ainda assim não houver, usar os dados diretamente do followingSample
+  if (baseFollowingUsers.length === 0 && data.followingSample.length > 0) {
+    baseFollowingUsers = data.followingSample.slice(0, 25).map((user) => ({
+      id: String(user.id),
+      username: user.username,
+      profilePicUrl: user.profilePicUrl,
+    }));
   }
 
   // Separar perfis para stories (primeiros 12, com repetição determinística se necessário)
@@ -236,11 +228,17 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
     hasStoryBorder?: boolean;
   };
 
-  function getDeterministicStoryBorder(seed: string): boolean {
-    // Aproximadamente 65% dos perfis terão borda de story
-    const hash = hashString(seed);
-    return (hash % 100) < 65;
-  }
+function getDeterministicStoryBorder(seed: string): boolean {
+  // Aproximadamente 65% dos perfis terão borda de story
+  const hash = hashString(seed);
+  return (hash % 100) < 65;
+}
+
+function getDeterministicGreenBorder(seed: string): boolean {
+  // Aproximadamente 30-40% dos perfis terão borda verde (melhores amigos)
+  const hash = hashString(seed);
+  return (hash % 100) < 35;
+}
 
   function getDeterministicOnlineIndicator(seed: string): boolean {
     // Aproximadamente 40% dos perfis terão indicador online
@@ -531,6 +529,9 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
               const noteSeed = `${username}-${user.id}-${index}-note`;
               const noteText = getDeterministicNote(noteSeed);
               const isWideNote = index >= 5; // Últimos 2 com nota mais larga
+              const greenBorderSeed = `${username}-${user.id}-${index}-green-border`;
+              const hasGreenBorder = getDeterministicGreenBorder(greenBorderSeed);
+              
               return (
                 <div key={user.id} className="flex shrink-0 flex-col items-center gap-1">
                   <div className="relative">
@@ -540,14 +541,24 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
                         {noteText}
                       </p>
                     </div>
-                    <div className="h-16 w-16 rounded-full overflow-hidden">
-                      <Image
-                        src={user.profilePicUrl}
-                        alt={maskUsername(user.username)}
-                        width={64}
-                        height={64}
-                        className="h-full w-full object-cover"
-                      />
+                    <div
+                      className={`h-16 w-16 rounded-full p-[2px] overflow-hidden ${
+                        hasGreenBorder
+                          ? "bg-gradient-to-tr from-green-400 via-green-500 to-green-600"
+                          : "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-500"
+                      }`}
+                    >
+                      <div className="h-full w-full rounded-full bg-[#0b1014] p-0.5 overflow-hidden">
+                        <div className="h-full w-full rounded-full overflow-hidden">
+                          <Image
+                            src={user.profilePicUrl}
+                            alt={maskUsername(user.username)}
+                            width={64}
+                            height={64}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <p className="max-w-[70px] truncate text-xs text-white">
@@ -586,14 +597,14 @@ export default async function DMPage({ params }: { params: PageParams | Promise<
 
 async function getProfileData(username: string) {
   try {
-    const data = await getInstagramData(username);
-    return { data, error: "" };
+    const result = await getInstagramDataOrMock(username);
+    return { data: result.data, error: "", usedMock: result.usedMock };
   } catch (error) {
     const message =
       error instanceof Error
         ? error.message
         : "Erro desconhecido ao buscar dados do Instagram.";
-    return { data: null, error: message };
+    return { data: null, error: message, usedMock: false };
   }
 }
 

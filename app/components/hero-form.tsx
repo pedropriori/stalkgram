@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -21,8 +21,6 @@ function getAllowedUsername(): string | null {
 
 export default function HeroForm() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [showInput, setShowInput] = useState(false);
   const [profileCount, setProfileCount] = useState(8516);
 
   useEffect(() => {
@@ -48,22 +46,16 @@ export default function HeroForm() {
     };
   }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const cleanUsername = username.replace("@", "").trim();
-    if (!cleanUsername) return;
 
+  function handleCardClick() {
     const allowedUsername = getAllowedUsername();
     if (allowedUsername) {
       router.push(`/vendas/${allowedUsername}`);
       return;
     }
 
-    router.push(`/confirmar/${cleanUsername}`);
-  }
-
-  function handleCardClick() {
-    setShowInput(true);
+    // Redirecionar para página de seleção de gênero
+    router.push("/genero");
   }
 
   return (
@@ -90,86 +82,26 @@ export default function HeroForm() {
         Descubra a verdade sobre qualquer pessoa do Instagram. Só com o @.
       </p>
 
-      {/* Input ou Botão */}
-      {!showInput ? (
-        <button
-          onClick={handleCardClick}
-          className="w-full rounded-2xl bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 px-6 py-4 flex items-center justify-center gap-2 text-white font-semibold text-lg transition-transform hover:scale-105"
+      {/* Botão */}
+      <button
+        onClick={handleCardClick}
+        className="w-full rounded-2xl bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 px-6 py-4 flex items-center justify-center gap-2 text-white font-semibold text-lg transition-transform hover:scale-105"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-          Espionar Agora
-        </button>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-pink-500 text-xl font-bold">
-              @
-            </div>
-            <input
-              id="username"
-              name="username"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              placeholder="Digite o @ da pessoa."
-              className="w-full rounded-2xl border border-white/20 bg-white/10 px-12 py-4 text-base text-white placeholder:text-white/50 outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-              required
-              autoFocus
-              aria-label="Digite o @ da pessoa"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-pink-500 hover:text-pink-400 transition"
-              aria-label="Buscar perfil"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Aviso */}
-          <div className="flex items-center justify-center gap-2 text-sm text-white/70">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-pink-500 shrink-0"
-            >
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-              <path d="M12 9v4" />
-              <path d="M12 17h.01" />
-            </svg>
-            <span>Apenas 1 pesquisa por pessoa.</span>
-          </div>
-        </form>
-      )}
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+        Espionar Agora
+      </button>
 
       {/* Disclaimer */}
       <div className="mt-6 space-y-2">

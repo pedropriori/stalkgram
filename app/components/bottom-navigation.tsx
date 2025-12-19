@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AccessPopup from "./access-popup";
+import ReelsIcon from "./icons/reels";
 
 interface BottomNavigationProps {
   profilePicUrl: string;
@@ -77,13 +78,8 @@ export default function BottomNavigation({ profilePicUrl, maskedProfileName, use
         </button>
 
         {/* Reels Icon */}
-        <button onClick={handleIconClick} className="cursor-pointer">
-          <Image
-            src="https://www.deepgram.online/home%20-%20feed/icones/reels.svg"
-            alt="Reels"
-            width={24}
-            height={24}
-          />
+        <button onClick={handleIconClick} className="cursor-pointer text-white">
+          <ReelsIcon width={24} height={24} />
         </button>
 
         {/* Profile Icon */}

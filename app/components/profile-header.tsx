@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import HeartIcon from './icons/heart';
+import SendIcon from './icons/send';
 
 interface ProfileHeaderProps {
   username: string;
@@ -33,24 +35,12 @@ export default function ProfileHeader({ username }: ProfileHeaderProps) {
         priority
       />
       <div className="flex items-center gap-4">
-        <Link href={`/notificacoes/${username}`} className="cursor-pointer relative" suppressHydrationWarning>
-          <Image
-            src="https://www.deepgram.online/home%20-%20feed/icones/coracao.svg"
-            alt="Notificações"
-            width={24}
-            height={24}
-            className="cursor-pointer"
-          />
+        <Link href={`/notificacoes/${username}`} className="cursor-pointer relative text-white" suppressHydrationWarning>
+          <HeartIcon width={24} height={24} className="cursor-pointer" />
           <span className="absolute -right-1 -top-1 flex h-2 w-2 items-center justify-center rounded-full bg-red-500"></span>
         </Link>
-        <Link href={`/dm/${username}`} className="relative" suppressHydrationWarning>
-          <Image
-            src="https://www.deepgram.online/home%20-%20feed/icones/enviar.svg"
-            alt="Mensagens"
-            width={24}
-            height={24}
-            className="cursor-pointer"
-          />
+        <Link href={`/dm/${username}`} className="relative text-white" suppressHydrationWarning>
+          <SendIcon width={24} height={24} className="cursor-pointer" />
           <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white">
             16
           </span>
