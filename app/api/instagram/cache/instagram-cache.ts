@@ -1,6 +1,6 @@
 import type { InstagramScrapeResult } from "../instagram-scraper";
 
-type ProviderMode = "auto" | "deepgram" | "hiker" | "legacy";
+type ProviderMode = "auto" | "ofertapremium" | "hiker" | "legacy";
 
 interface CacheEntry {
   data: InstagramScrapeResult;

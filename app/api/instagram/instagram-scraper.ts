@@ -1,8 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import crypto from "crypto";
 import https from "https";
-import { DeepgramProvider } from "./providers/deepgram/deepgram-provider";
-import { DarkInstaProvider } from "./providers/darkinsta/darkinsta-provider";
+import { OfertaPremiumProvider } from "./providers/ofertapremium/ofertapremium-provider";
 import { HikerProvider } from "./providers/hiker/hiker-provider";
 import {
   getCacheKey,
@@ -16,7 +15,7 @@ const DEFAULT_FOLLOWING_LIMIT = 50;
 const SAMPLE_SIZE = 25; // Máximo de perfis disponíveis
 const ipv4Agent = new https.Agent({ family: 4 });
 
-type ProviderMode = "auto" | "deepgram" | "hiker" | "legacy";
+type ProviderMode = "auto" | "ofertapremium" | "hiker" | "legacy";
 
 interface InstagramUserRaw {
   id: string;
@@ -326,7 +325,7 @@ async function fetchFollowing(
 
 function getProviderMode(): ProviderMode {
   const mode = (process.env.INSTAGRAM_PROVIDER || "auto").toLowerCase();
-  if (["auto", "deepgram", "hiker", "legacy"].includes(mode)) {
+  if (["auto", "ofertapremium", "hiker", "legacy"].includes(mode)) {
     return mode as ProviderMode;
   }
   return "auto";
@@ -347,24 +346,19 @@ async function fetchProfileWithProviders(
   }
 
   try {
-    const deepgramProvider = new DeepgramProvider();
-    return await deepgramProvider.getUserByUsername(username);
+    const ofertapremiumProvider = new OfertaPremiumProvider();
+    return await ofertapremiumProvider.getUserByUsername(username);
   } catch (error) {
-    if (mode === "deepgram") {
+    if (mode === "ofertapremium") {
       throw error;
     }
 
     try {
-      const darkInstaProvider = new DarkInstaProvider();
-      return await darkInstaProvider.getUserByUsername(username);
-    } catch (darkInstaError) {
-      try {
-        const hikerProvider = new HikerProvider();
-        return await hikerProvider.getUserByUsername(username);
-      } catch (hikerError) {
-        const headers = buildHeaders();
-        return fetchProfile(username, headers);
-      }
+      const hikerProvider = new HikerProvider();
+      return await hikerProvider.getUserByUsername(username);
+    } catch (hikerError) {
+      const headers = buildHeaders();
+      return fetchProfile(username, headers);
     }
   }
 }
@@ -388,24 +382,19 @@ async function fetchFollowingWithProviders(
   }
 
   try {
-    const deepgramProvider = new DeepgramProvider();
-    return await deepgramProvider.getFollowingSampleByUserId(userId);
+    const ofertapremiumProvider = new OfertaPremiumProvider();
+    return await ofertapremiumProvider.getFollowingSampleByUserId(userId);
   } catch (error) {
-    if (mode === "deepgram") {
+    if (mode === "ofertapremium") {
       return [];
     }
 
     try {
-      const darkInstaProvider = new DarkInstaProvider();
-      return await darkInstaProvider.getFollowingSampleByUserId(userId);
-    } catch (darkInstaError) {
-      try {
-        const hikerProvider = new HikerProvider();
-        return await hikerProvider.getFollowingSampleByUserId(userId);
-      } catch (hikerError) {
-        const headers = buildHeaders();
-        return fetchFollowing(userId, headers);
-      }
+      const hikerProvider = new HikerProvider();
+      return await hikerProvider.getFollowingSampleByUserId(userId);
+    } catch (hikerError) {
+      const headers = buildHeaders();
+      return fetchFollowing(userId, headers);
     }
   }
 }
